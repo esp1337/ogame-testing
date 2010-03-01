@@ -13,6 +13,11 @@ import threading
 import StringIO
 
 class Weblogic:
+    """
+    This class handles the web logic for the OGame bot/shell/thing.
+    Methods here interface directly with the code on the website and return
+    results which can be used by systems of higher intelligence.
+    """
 
     def __init__(self):
         self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor())
@@ -23,6 +28,7 @@ class Weblogic:
         self.passwd = re.search("password:\s(.*?);", info, re.M).group(1)
         self.server = re.search("server:\s(.*?);", info, re.M).group(1)
         self.SESSION_REGEX = re.compile(r"[0-9A-Fa-f]{12}")
+        self.PLAYER_REGEX = re.compile(r"id=\"playerName\".*?efy\"\>(.*?)\<")
         self.session = None
 
     def fetchResponse(self, request):
@@ -43,7 +49,20 @@ class Weblogic:
                          (self.server, self.server, self.user, self.passwd)
         page = self.fetchResponse(login_url)
         self.session = self.SESSION_REGEX.search(page.getvalue()).group(0)
+        self.player = self.PLAYER_REGEX.search(page.getvalue()).group(1)
 
+class LoginData:
+    """
+    Store relevant login data in this class.
+    """
+
+    def __init__(self, session):
+        self.session = session
+
+
+#####################################
+#        TESTS
+#####################################
 
 class LoginSetup(unittest.TestCase):
     def setUp(self):
