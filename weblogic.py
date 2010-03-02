@@ -31,6 +31,15 @@ class Weblogic:
         self.PLAYER_REGEX = re.compile(r"id=\"playerName\".*?efy\"\>(.*?)\<")
         self.session = None
 
+        headers = [('Keep-Alive', "300")]
+        self.opener.addheaders = headers
+
+    def setRecentResponse(self, response):
+        self._recentResponse = response
+        
+    def getRecentResponse(self):
+        return self._recentResponse
+
     def fetchResponse(self, request):
 
         if isinstance(request, str):
@@ -42,22 +51,26 @@ class Weblogic:
         self.lastFetchedURL = response.geturl()
         cachedResponse = StringIO.StringIO(response.read())
         cachedResponse.seek(0)
+        setRecentResponse(cachedResponse)
         return cachedResponse
     
     def login(self):
         login_url = "http://%s.ogame.org/game/reg/login2.php?uni_url=%s.ogame.org&login=%s&pass=%s" %\
-                         (self.server, self.server, self.user, self.passwd)
+                    (self.server, self.server, self.user, self.passwd)
         page = self.fetchResponse(login_url)
-        self.session = self.SESSION_REGEX.search(page.getvalue()).group(0)
-        self.player = self.PLAYER_REGEX.search(page.getvalue()).group(1)
+        session = self.SESSION_REGEX.search(page.getvalue()).group(0)
+        player = self.PLAYER_REGEX.search(page.getvalue()).group(1)
+        ld = LoginData(session, player)
+        return ld
 
 class LoginData:
     """
     Store relevant login data in this class.
     """
 
-    def __init__(self, session):
+    def __init__(self, session, player):
         self.session = session
+        self.player = player
 
 
 #####################################

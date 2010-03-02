@@ -1,0 +1,2 @@
+#ignore all .ogame files, like the login config.
+*.ogame
