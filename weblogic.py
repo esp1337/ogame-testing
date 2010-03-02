@@ -49,10 +49,10 @@ class Weblogic:
 
         response = self.opener.open(request)
         self.lastFetchedURL = response.geturl()
-        cachedResponse = StringIO.StringIO(response.read())
-        cachedResponse.seek(0)
-        setRecentResponse(cachedResponse)
-        return cachedResponse
+        self.cachedResponse = StringIO.StringIO(response.read())
+        self.cachedResponse.seek(0)
+        self.setRecentResponse(self.cachedResponse)
+        return self.cachedResponse
     
     def login(self):
         login_url = "http://%s.ogame.org/game/reg/login2.php?uni_url=%s.ogame.org&login=%s&pass=%s" %\
