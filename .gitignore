@@ -1,2 +1,5 @@
 #ignore all .ogame files, like the login config.
 *.ogame
+ignore compiled python files and emacs backups
+*.pyc
+*~

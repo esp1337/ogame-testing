@@ -10,6 +10,7 @@ import unittest
 import urllib
 import urllib2
 import threading
+import queue
 import StringIO
 
 class Weblogic:
@@ -20,6 +21,7 @@ class Weblogic:
     """
 
     def __init__(self):
+        self.requestQueue = queue.Queue()
         self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor())
         self.lastFetchedURL = None
         f = open("login.ogame")
@@ -28,11 +30,14 @@ class Weblogic:
         self.passwd = re.search("password:\s(.*?);", info, re.M).group(1)
         self.server = re.search("server:\s(.*?);", info, re.M).group(1)
         self.SESSION_REGEX = re.compile(r"[0-9A-Fa-f]{12}")
-        self.PLAYER_REGEX = re.compile(r"id=\"playerName\".*?efy\"\>(.*?)\<")
+        self.PLAYER_REGEX = re.compile("id=\"playerName\".*?efy\"\>(.*?)\<", re.S|re.M)
         self.session = None
 
         headers = [('Keep-Alive', "300")]
         self.opener.addheaders = headers
+
+    def submitRequest(self, request):
+        self.requestQueue.put(request)
 
     def setRecentResponse(self, response):
         self._recentResponse = response
@@ -49,10 +54,10 @@ class Weblogic:
 
         response = self.opener.open(request)
         self.lastFetchedURL = response.geturl()
-        self.cachedResponse = StringIO.StringIO(response.read())
-        self.cachedResponse.seek(0)
-        self.setRecentResponse(self.cachedResponse)
-        return self.cachedResponse
+        cachedResponse = StringIO.StringIO(response.read())
+        cachedResponse.seek(0)
+        self.setRecentResponse(cachedResponse)
+        return cachedResponse
     
     def login(self):
         login_url = "http://%s.ogame.org/game/reg/login2.php?uni_url=%s.ogame.org&login=%s&pass=%s" %\
@@ -62,6 +67,16 @@ class Weblogic:
         player = self.PLAYER_REGEX.search(page.getvalue()).group(1)
         ld = LoginData(session, player)
         return ld
+
+class RequestService(threading.Tread):
+    """
+    The requestService is a thread that runs and waits for requests to put into
+    the request queue. When requests are added to the queue, the requestService
+    is notified and will process them.
+    """
+
+    def __init__:
+        pass
 
 class LoginData:
     """
@@ -80,11 +95,11 @@ class LoginData:
 class LoginSetup(unittest.TestCase):
     def setUp(self):
         self.wl = Weblogic()
-        self.wl.login()
+        self.ld = self.wl.login()
 
 class LoginFileTest(LoginSetup):
     def testWeHaveSessionID(self):
-        self.failIfEqual(None, self.wl.session)
+        self.failIfEqual(None, self.ld.session)
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(LoginFileTest)
