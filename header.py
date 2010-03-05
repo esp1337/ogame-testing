@@ -10,8 +10,8 @@ class Header:
         self.wl = weblogic.Weblogic()
         ld = self.wl.login()
         header_url = "http://%s.ogame.org/game/index.php?page=fetchEventbox&session=%s&ajax=1" %\
-                    (self.wl.server, self.wl.server, ld.session)
-        page = self.fetchResponse(header_url)
+                    (self.wl.server, ld.session)
+        page = self.wl.fetchResponse(header_url)
         enemy = self.HOSTILE_INDEX.search(page.getvalue()).group(1)
         return enemy
 

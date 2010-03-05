@@ -10,7 +10,7 @@ import unittest
 import urllib
 import urllib2
 import threading
-import queue
+import Queue
 import StringIO
 
 class Weblogic:
@@ -21,7 +21,7 @@ class Weblogic:
     """
 
     def __init__(self):
-        self.requestQueue = queue.Queue()
+        self.requestQueue = Queue.Queue()
         self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor())
         self.lastFetchedURL = None
         f = open("login.ogame")
@@ -68,14 +68,14 @@ class Weblogic:
         ld = LoginData(session, player)
         return ld
 
-class RequestService(threading.Tread):
+class RequestService(threading.Thread):
     """
     The requestService is a thread that runs and waits for requests to put into
     the request queue. When requests are added to the queue, the requestService
     is notified and will process them.
     """
 
-    def __init__:
+    def __init__(self):
         pass
 
 class LoginData:
