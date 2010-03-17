@@ -88,7 +88,7 @@ class Planet:
         self.totalfields = totalfields
         self.location = location
 
-    def switch(self, pane):
+    def switch(self, pane, session):
         """
         post a request to switch to this planet
         
@@ -96,7 +96,7 @@ class Planet:
            ie, shipyard, resources, etc.
         """
         sw_url = "http://%s.ogame.org/game/index.php?page=%s&session=%s&cp=%s" \
-                 % (self.wl.server, pane, self.session, self.id)
+                 % (self.wl.server, pane, session, self.id)
         self.wl.fetchResponse(sw_url)
 
     def toString(self):
