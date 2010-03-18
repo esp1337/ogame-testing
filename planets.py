@@ -25,6 +25,8 @@ class PlanetManager:
         self.PLANET_COUNT_REGEX = re.compile("span\>(\d+)\/\d+\<", re.S|re.M)
         # group1: id;  group2: usedfields; group3: totalfields; group4: name; group5: coords
         self.PLANET_FIND_REGEX = re.compile("smallplanet.*?href\=\".*?cp\=(.*?)\".*?km\s\((\d+)\/(\d+).*?name\"\>(.*?)\<\/span.*?koords\"\>(.*?)\<\/", re.S|re.M)
+        # group1: usedfields; group2: totalfields; group3: name; group4: coords
+        self.PLANET_FIND_REGEX_NO_SWITCH = re.compile("smallplanet.*?href\=\".*?\".*?km\s\((\d+)\/(\d+).*?name\"\>(.*?)\<\/span.*?koords\"\>(.*?)\<\/", re.S|re.M)
 
     def countPlanets(self, page):
         """
@@ -66,6 +68,26 @@ class PlanetManager:
             if p.id not in existing_ids:
                 self.planets.append(p)
         return planets
+    
+    def currentPlanet(self, page):
+        """
+        Find the current planet (one w/o a cp=. value in the side-url) and return it w/o the ID.
+
+        return: a Planet object
+        args: page - the source of the page from which to find the planet info
+        """
+        planet = None
+
+        if not isinstance(page, str):
+            page = page.getvalue()
+        aps = self.PLANET_FIND_REGEX_NO_SWITCH.finditer(page)
+        for ap in aps:
+            planet = Planet(self.wl, ap.group(3), None,
+                       int(ap.group(1)), int(ap.group(2)),
+                       (Location(ap.group(4))))
+            break
+        print "CurrentPlanet :: " + planet.location.string
+        return planet
             
 class Planet:
     """
