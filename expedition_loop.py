@@ -84,6 +84,7 @@ class ExpeditionLoop:
         
         fleetMatch = self.fleetSlotREGEX.search(page.getvalue())
         if fleetMatch == None:
+            print "No fleet regex match on fleet page!"
             return False
         fleetCurrent = fleetMatch.group(1)
         fleetTotal = fleetMatch.group(2)
