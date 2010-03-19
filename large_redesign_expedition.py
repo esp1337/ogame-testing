@@ -11,9 +11,9 @@ class LargeExpedition:
         self.fleet2 = "http://%s.ogame.org/game/index.php?page=fleet2&session=%s"
         self.fleet2argsz = "&galaxy=%s&system=%s&position=%s&type=1&mission=0&speed=10&am204=&am205=110&am206=&am207=&am215=&am211=&am213=2&am202=&am203=80&am209=&am210=1"
         self.fleet3 = "http://%s.ogame.org/game/index.php?page=fleet3&session=%s"
-        self.fleet3argsz = "&type=1&mission=0&union=0&am202=1&am210=1&galaxy=%s&system=%s&position=16&speed=10"
+        self.fleet3argsz = "&type=1&mission=0&union=0&am203=80&am205=110&am213=2&am210=1&galaxy=%s&system=%s&position=16&speed=10"
         self.flights = "http://%s.ogame.org/game/index.php?page=movement&session=%s"
-        self.flightargsz = "&holdingtime=1&expeditiontime=1&galaxy=%s&system=%s&position=16&type=1&mission=15&union2=0&holdingOrExpTime=1&speed=10&am203=80&am205=110&am213=2=&am210=1&resource1=0&resource2=0&resource3=0"
+        self.flightargsz = "&holdingtime=1&expeditiontime=1&galaxy=%s&system=%s&position=16&type=1&mission=15&union2=0&holdingOrExpTime=1&speed=10&am203=80&am205=110&am213=2&am210=1&resource1=0&resource2=0&resource3=0"
 
         self.lcCountREGEX = re.compile(r"title=\"\|Large Cargo \(([0-9]+)\)\"")
         self.probeCountREGEX = re.compile(r"title=\"\|Espionage Probe \(([0-9]+)\)\"")
@@ -34,21 +34,21 @@ class LargeExpedition:
             return False
         
         second_page = self.fleet2+self.fleet2argsz
-        print second_page
-        print self.ld.session
-        print self.wl.server
         fleet_url = second_page %\
                     (self.wl.server, self.ld.session, gal, ss, posn)
+        print fleet_url
         page = self.wl.fetchResponse(fleet_url)
 
         third_page = self.fleet3+self.fleet3argsz
         fleet_url = third_page %\
                     (self.wl.server, self.ld.session, gal, ss)
+        print fleet_url
         page = self.wl.fetchResponse(fleet_url)
         
         final_page = self.flights+self.flightargsz
         fleet_url = final_page %\
                     (self.wl.server, self.ld.session, gal, ss)
+        print fleet_url
         page = self.wl.fetchResponse(fleet_url)
         return True
         
