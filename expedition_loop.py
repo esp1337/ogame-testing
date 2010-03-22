@@ -43,38 +43,45 @@ class ExpeditionLoop:
     
     def delayTime(self):
         delay = random.randint(1,5)
-        print "Sleeping " + str(delay) + " seconds..."
+        print "Sleeping " + str(delay) + " seconds between requests..."
         time.sleep(delay)
     
+    def getFleetURL(self, wl, ld):
+        fleetUrl = self.fleet1 %\
+                    (wl.server, ld.session)
+        return fleetUrl
+    
     def runExpeditions(self, wl, ld):
-        loginpage = wl._recentResponse
+        #get fleet1 page since it has planet listings on it; a cached page might not
+        fleet1_url = self.getFleetURL(wl, ld)
+        fleetpage = wl.fetchResponse(fleet1_url)
         planetManager = planets.PlanetManager(wl)
-        loop.delayTime()
-        current = planets.PlanetManager.currentPlanet(planetManager, loginpage)
+        self.delayTime()
+        current = planets.PlanetManager.currentPlanet(planetManager, fleetpage)
         
         if not self.checkOpenSlots():
             print "No open slots, cancelling expedition loop!"
             return
-        loop.largeExpeditionFromCoords(current.location.galaxy, current.location.solarsystem, current.location.slot)
+        self.largeExpeditionFromCoords(current.location.galaxy, current.location.solarsystem, current.location.slot)
 
-        planetList = planets.PlanetManager.availablePlanets(planetManager, loginpage)
+        planetList = planets.PlanetManager.availablePlanets(planetManager, fleetpage)
         
         for planet in planetList:
             if not self.checkOpenSlots():
                 print "No open slots, cancelling expedition loop!"
                 return
-            loop.delayTime()
-            loop.largeExpeditionFromPlanet(planet)
+            self.delayTime()
+            self.largeExpeditionFromPlanet(planet)
             
         for planet in planetList:
             if not self.checkOpenSlots():
                 print "No open slots, cancelling small expedition loop!"
                 return
-            loop.delayTime()
-            loop.smallExpeditionFromPlanet(planet)
+            self.delayTime()
+            self.smallExpeditionFromPlanet(planet)
         
         #small expeditions prioritized after last
-        loop.smallExpeditionFromCoords(current.location.galaxy, current.location.solarsystem, current.location.slot)
+        self.smallExpeditionFromCoords(current.location.galaxy, current.location.solarsystem, current.location.slot)
     
     def checkOpenSlots(self):
         fleet_url = self.fleet1 %\

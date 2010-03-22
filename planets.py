@@ -82,6 +82,7 @@ class PlanetManager:
             page = page.getvalue()
         aps = self.PLANET_FIND_REGEX_NO_SWITCH.finditer(page)
         for ap in aps:
+            print ap.group(4)
             planet = Planet(self.wl, ap.group(3), None,
                        int(ap.group(1)), int(ap.group(2)),
                        (Location(ap.group(4))))
