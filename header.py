@@ -33,10 +33,11 @@ class Header:
         flights = self.FLIGHTS_REGEX.findall(page)
         for flight in flights:
             info = self.DETAILED_FLIGHT_REGEX.findall(flight)
-            info = info.pop()
-            f = FlightInfo(info[0],info[1],info[2],info[3],info[4],info[5],info[6],
+            if info.__len__() > 0:
+                info = info.pop()
+                f = FlightInfo(info[0],info[1],info[2],info[3],info[4],info[5],info[6],
                            info[7],info[8],info[9],info[10],info[11],info[12],info[13])
-            allflights.append(f)
+                allflights.append(f)
         return allflights
 
 class FlightInfo:
