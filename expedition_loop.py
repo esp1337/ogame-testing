@@ -106,7 +106,6 @@ class ExpeditionLoop:
             ret = True
         else:
             print "No fleetslots available to send more expeditions!"
-        print ret
         return ret
         
 if __name__ == '__main__':
@@ -114,26 +113,5 @@ if __name__ == '__main__':
     ld = wl.login()
     loop = ExpeditionLoop(wl, ld)
     loop.runExpeditions(wl, ld)
-    """
-    loginpage = wl._recentResponse
-    planetManager = planets.PlanetManager(wl)
-    loop.delayTime()
-    
-    current = planets.PlanetManager.currentPlanet(planetManager, loginpage)
-    loop.largeExpeditionFromCoords(current.location.galaxy, current.location.solarsystem, current.location.slot)
-    
-    planetList = planets.PlanetManager.availablePlanets(planetManager, loginpage)    
-    for planet in planetList:
-        loop.delayTime()
-        loop.smallExpeditionFromPlanet(planet)
-    
-    #small expeditions prioritized after last
-    loop.smallExpeditionFromCoords(current.location.galaxy, current.location.solarsystem, current.location.slot)
-    """
-"""
-    for planet in planetList:
-        loop.delayTime()
-        loop.largeExpeditionFromPlanet(planet)
-"""   
     
     

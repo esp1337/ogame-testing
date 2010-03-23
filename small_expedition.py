@@ -70,7 +70,6 @@ class SmallExpedition:
             
             if int(probes) > 0 and int(sc) > 0:
                 ret = True
-            print ret
             return ret
     
     def checkForSlots(self, fleet1page):
@@ -90,7 +89,6 @@ class SmallExpedition:
             ret = True
         else:
             print "No fleetslots available!"
-        print ret
         return ret
     
 if __name__ == '__main__':

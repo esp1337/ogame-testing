@@ -21,6 +21,11 @@ class TimedExpeditions:
         title = "Attack warning!"
         body = str(flightCount) + " hostile fleets are incoming!"
         self.mailer.sendEmail(title, body)
+        
+    def printFlightInfo(self, detailedFlightList):
+        print "Current Fleet Info :: "
+        for flight in detailedFlightList:
+            print "\t" + flight.toShortString()
     
 if __name__ == '__main__':
     wl = weblogic.Weblogic()
@@ -41,4 +46,7 @@ if __name__ == '__main__':
             print "Taking 2700 seconds off of expedition time & sending expeditions!"
             loop.runExpeditions(wl, ld)
             expeditionTime -= 2700
+        detailed = hostileCount.detailedFlights(wl, ld)
+        timer.printFlightInfo(detailed)
+        
         expeditionTime += timer.delayTime(450, 900)

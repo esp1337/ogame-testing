@@ -84,7 +84,6 @@ class LargeExpedition:
             
             if int(probes) >= 1 and int(hf) >= 110 and int(lc) >= 80 and int(destroyers) >= 2:
                 ret = True
-            print ret
             return ret
     
     def checkForSlots(self, fleet1page):
@@ -104,7 +103,6 @@ class LargeExpedition:
             ret = True
         else:
             print "No fleetslots available!"
-        print ret
         return ret
     
 if __name__ == '__main__':
