@@ -33,8 +33,9 @@ if __name__ == '__main__':
     enemyFlights = 0
     while True:
         enemyFlights = hostileCount.flights(wl, ld)
-        if enemyFlights > 0:
-            print "Incoming hostile flight!"
+        print str(enemyFlights)
+        if int(enemyFlights) > 0:
+            print str(enemyFlights) + " incoming hostile flight(s)!"
             timer.sendWarning(enemyFlights)
         if expeditionTime >= 2700:
             print "Taking 2700 seconds off of expedition time & sending expeditions!"
