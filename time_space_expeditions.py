@@ -34,18 +34,20 @@ if __name__ == '__main__':
     hostileCount = header.Header()
     
     loop = expedition_loop.ExpeditionLoop(wl, ld)
-    expeditionTime = 2700
+    #expeditionTime = 2700
     enemyFlights = 0
     while True:
         enemyFlights = hostileCount.flights(wl, ld)
         if int(enemyFlights) > 0:
             print str(enemyFlights) + " incoming hostile flight(s)!"
             timer.sendWarning(enemyFlights)
-        if expeditionTime >= 2700:
-            print "Taking 2700 seconds off of expedition time & sending expeditions!"
+        #if expeditionTime >= 2700:
+        #    print "Taking 2700 seconds off of expedition time & sending expeditions!"
+        #    loop.runExpeditions(wl, ld)
+        #    expeditionTime -= 2700
+        if loop.checkOpenSlots():
             loop.runExpeditions(wl, ld)
-            expeditionTime -= 2700
+            
         detailed = hostileCount.detailedFlights(wl, ld)
         timer.printFlightInfo(detailed)
-        
-        expeditionTime += timer.delayTime(450, 900)
+        timer.delayTime(450, 900)
