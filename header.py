@@ -63,6 +63,8 @@ class FlightInfo:
     def __init__(self, incHour, incMin, incSec, descrip, mission, incOrigin, incGal, incSys, incSlot, incDetails, tgtName, tgtGal, tgtSys, tgtSlot):
         #fix hour for GMT
         self.arrival_hour=str(int(incHour)-5)
+        if int(self.arrival_hour) < 0:
+            self.arrival_hour = int(self.arrival_hour) + 24
         self.arrival_minute=incMin
         self.arrival_second=incSec
         self.fleet_descr=descrip

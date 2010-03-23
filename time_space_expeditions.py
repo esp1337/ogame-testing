@@ -38,7 +38,6 @@ if __name__ == '__main__':
     enemyFlights = 0
     while True:
         enemyFlights = hostileCount.flights(wl, ld)
-        print str(enemyFlights)
         if int(enemyFlights) > 0:
             print str(enemyFlights) + " incoming hostile flight(s)!"
             timer.sendWarning(enemyFlights)
