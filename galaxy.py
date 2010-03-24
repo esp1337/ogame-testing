@@ -1,116 +1,115 @@
 import re
 import weblogic
+import planets
+import time
+import random
 """
-#find the 15 slots
-(?:<tr class=\"row\">(.+?)</tr>)+
-#
-<td class=\"position\">(\d+)</td>.+?
-<span class=\"status_abbr_(?:long)?inactive\">(.+?)</span>
-
-<span class=\"status_abbr_?(?:long)?inactive\">(.+?)</span>
-<span class=\"status_abbr_longinactive\">(.+?)</span>
-
-need to notice & not attack noob / banned / vacation inactives
-
+check probe/flight status
 """
 class GalaxyScanner:
     
     def __init__(self):
-        self.flightListings = "http://%s.ogame.org/game/index.php?page=eventList&session=%s&ajax=1&height=500&width=690"
-        self.flightInfoURL = "http://%s.ogame.org/game/index.php?page=fetchEventbox&session=%s&ajax=1"
-        #find a hostile count
-        self.HOSTILE_INDEX = re.compile(r"\"hostile\":([0-9]*)")
-        #find the info for each separate flight
-        self.FLIGHTS_REGEX = re.compile("<div class=\"eventFleet\" id=\"eventRow-[\d]+\">(.+?)</div>",re.DOTALL)
-        #find particular fields in flight info
-        self.DETAILED_FLIGHT_REGEX = re.compile("arrivalTime\">([0-9]+):([0-9]+):([0-9]+).+?descFleet\">([\w ]+)<.+?missionFleet\">.+?<span>([\w \)\(]+)<.+?originFleet\">(.+?)</li>.+?coordsOrigin\">.+?\[(\d+):(\d+):(\d+).+?detailsFleet\">\s+([\d\.]+).+?destFleet\">([\w ]+)<.+?destCoords\">.+\[(\d+):(\d+):(\d+)\]",re.DOTALL)
+        self.SLOT_REGEX = re.compile("(?:<tr class=\"row\">(.+?)</tr>)+", re.DOTALL)
+        self.POSITION_REGEX = re.compile("<td class=\"position\">(\d+)</td>", re.DOTALL)
+        self.INACTIVE_REGEX = re.compile("<span class=\"status_abbr_(?:long)?inactive\">(.+?)</span>", re.DOTALL)
+        self.VACA_REGEX = re.compile("<span class=\'status_abbr_vacation")
+        self.NOOB_REGEX = re.compile("<span class=\'status_abbr_noob")
+        self.BAN_REGEX = re.compile("<span class=\'status_abbr_banned")
         
-    def flights(self, wl, ld):
-        header_url = self.flightInfoURL %\
-                    (wl.server, ld.session)
-        page = wl.fetchResponse(header_url)
-        enemy = self.HOSTILE_INDEX.search(page.getvalue()).group(1)
-        return enemy
-    
-    def detailedFlights(self, wl, ld):
-        header_url = self.flightListings %\
-                    (wl.server, ld.session)
-        page = wl.fetchResponse(header_url)
+        self.galaxyURL = "http://%s.ogame.org/game/index.php?page=galaxyContent&session=%s&ajax=1&galaxy=%s&system=%s"
+        self.espionageSendURL = "http://%s.ogame.org/game/index.php?page=minifleet&session=%s&ajax=1&mission=6&galaxy=%s&system=%s&position=%s&type=1&shipCount=5"
+        
+    def getAttackableInactivePlanetsInSystem(self, wl, ld, gal, system):
+        galaxy_url = self.galaxyURL %\
+                    (wl.server, ld.session, gal, system)
+        page = wl.fetchResponse(galaxy_url)
         page = page.getvalue()
         
-        return self.detailedFlightsOnPage(page)
+        return self.getAttackableInactivePlanets(page, gal, system)
+        
+    def getAttackableInactivePlanets(self, page, gal, system):
+        planets = []
+        slots = self.SLOT_REGEX.findall(page)
+        for slot in slots:
+            posn = self.POSITION_REGEX.search(slot).group(1)
+            inactive = self.INACTIVE_REGEX.search(slot)
+            vmode = self.VACA_REGEX.search(slot)
+            noob = self.NOOB_REGEX.search(slot)
+            ban = self.BAN_REGEX.search(slot)
+            if inactive != None and vmode == None and ban == None and noob == None:
+                planet = PlanetInfo(gal, system, posn)
+                planets.append(planet)
+        return planets
     
-    def detailedFlightsOnPage(self, page):
-        allflights = []
-        flights = self.FLIGHTS_REGEX.findall(page)
-        for flight in flights:
-            info = self.DETAILED_FLIGHT_REGEX.findall(flight)
-            if info.__len__() > 0:
-                info = info.pop()
-                f = FlightInfo(info[0],info[1],info[2],info[3],info[4],info[5],info[6],
-                           info[7],info[8],info[9],info[10],info[11],info[12],info[13])
-                allflights.append(f)
-        return allflights
+    def sendProbes(self, wl, ld, gal, system, slot):
+        probe_url = self.espionageSendURL %\
+                    (wl.server, ld.session, str(gal), str(system), str(slot))
+        print probe_url
+        page = wl.fetchResponse(probe_url)
+        page = page.getvalue()
+        #returns a string with
+        #statusCode totalSlots probesLeft recyclersLeft ipmsLeft probesSent missionType [coords]
+        print page
+    
+    def scanSystems(self, wl, ld, gal_start, system_start, scanLimit):
+        print "Starting up/down scan of systems with a limit of " + str(scanLimit)
+        self.scanUpSystems(wl, ld, gal_start, system_start, scanLimit)
+        self.scanDownSystems(wl, ld, gal_start, system_start, scanLimit)
+        
+    def scanDownSystems(self, wl, ld, gal_start, system_start, scanLimit):
+        gal = gal_start
+        system = system_start
+        systemOffset = int(0)
+        while systemOffset <= int(scanLimit):
+            system -= systemOffset
+            planets = self.getAttackableInactivePlanetsInSystem(wl, ld, gal, system)
+            self.delayTime(1, 5)
+            for planet in planets:
+                print "Probing planet " + planet.getInfoString()
+                self.sendProbes(wl, ld, gal, system, planet.slot)
+                self.delayTime(1, 5)
+            systemOffset += 1
+    
+    def scanUpSystems(self, wl, ld, gal_start, system_start, scanLimit):
+        gal = gal_start
+        system = system_start
+        systemOffset = int(0)
+        while systemOffset <= int(scanLimit):
+            system += systemOffset
+            planets = self.getAttackableInactivePlanetsInSystem(wl, ld, gal, system)
+            self.delayTime(1, 5)
+            for planet in planets:
+                print "Probing planet " + planet.getInfoString()
+                self.sendProbes(wl, ld, gal, system, planet.slot)
+                self.delayTime(1, 5)
+            systemOffset += 1
 
-class FlightInfo:
-    """
-    Store information about a flight
+    def delayTime(self, lowerBound, upperBound):
+        delay = random.randint(lowerBound, upperBound)
+        print "Sleeping " + str(delay) + " seconds..."
+        time.sleep(delay)
+        return delay
 
-    FIELDS:
-    arrival hour
-    arrival minute
-    arrival second
-    fleet descr
-    fleet mission
-    fleet origin (name)
-    origin gal
-    origin system
-    origin slot
-    fleet details (count, doesn't go into the shiplink)
-    fleet destination (name)
-    dest gal
-    dest system
-    dest slot
-    """
-
-    def __init__(self, incHour, incMin, incSec, descrip, mission, incOrigin, incGal, incSys, incSlot, incDetails, tgtName, tgtGal, tgtSys, tgtSlot):
-        #fix hour for GMT
-        self.arrival_hour=str(int(incHour)-5)
-        if int(self.arrival_hour) < 0:
-            self.arrival_hour = int(self.arrival_hour) + 24
-        self.arrival_minute=incMin
-        self.arrival_second=incSec
-        self.fleet_descr=descrip
-        self.fleet_mission=mission
-        self.fleet_origin=incOrigin# (name)
-        self.origin_gal=incGal
-        self.origin_system=incSys
-        self.origin_slot=incSlot
-        self.fleet_details=incDetails# (count, doesn't go into the shiplink for ship breakdown)
-        self.fleet_destination=tgtName# (name)
-        self.dest_gal=tgtGal
-        self.dest_system=tgtSys
-        self.dest_slot=tgtSlot
-
-    def toShortString(self):
-        return "%s ships from %s to %s to do a(n) %s %s arriving on %s:%s:%s" %\
-              (str(self.fleet_details), str(self.fleet_origin), str(self.fleet_destination), str(self.fleet_descr), str(self.fleet_mission), str(self.arrival_hour), str(self.arrival_minute), str(self.arrival_second))
-
+class PlanetInfo:
+    def __init__(self, gal, system, slot):
+        self.galaxy = gal
+        self.system = system
+        self.slot = slot
+        
+    def getInfoString(self):
+        return "%s:%s:%s" %\
+                    (str(self.galaxy), str(self.system), str(self.slot))
+        
 if __name__ == '__main__':
-    if 0==1:
-        f = open("flights_infotest.html")
+    if 1==0:
+        f = open("galaxy_source_test.html")
         info = f.read()
-        hdr = Header()
-        flights = hdr.detailedFlightsOnPage(info)
-        for flight in flights:
-            print flight.toShortString()
+        hdr = GalaxyScanner()
+        planets = hdr.getAttackableInactivePlanets(info, 5, 357)
+        for planet in planets:
+            print planet.getInfoString()
     else:
         wl = weblogic.Weblogic()
         ld = wl.login()
-        h = Header()
-        enemy = h.flights(wl, ld)
-        print "Number of hostile flights:"+str(enemy)
-        details = h.detailedFlights(wl, ld)
-        if details.__len__() > 0:
-            first = details[0]
-            print first.toShortString()
+        scanner = GalaxyScanner()
+        scanner.scanSystems(wl, ld, 3, 361, 1)
