@@ -23,6 +23,7 @@ class Header:
     def detailedFlights(self, wl, ld):
         header_url = self.flightListings %\
                     (wl.server, ld.session)
+        print header_url
         page = wl.fetchResponse(header_url)
         page = page.getvalue()
         

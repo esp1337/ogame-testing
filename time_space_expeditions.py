@@ -22,32 +22,41 @@ class TimedExpeditions:
         body = str(flightCount) + " hostile fleets are incoming!"
         self.mailer.sendEmail(title, body)
         
+    def sendWarning(self, body, title="Error Warning!"):
+        self.mailer.sendEmail(title, body)
+        
     def printFlightInfo(self, detailedFlightList):
         print "Current Fleet Info :: "
         for flight in detailedFlightList:
             print "\t" + flight.toShortString()
     
 if __name__ == '__main__':
-    wl = weblogic.Weblogic()
-    ld = wl.login()
-    timer = TimedExpeditions()
-    hostileCount = header.Header()
-    
-    loop = expedition_loop.ExpeditionLoop(wl, ld)
-    #expeditionTime = 2700
-    enemyFlights = 0
-    while True:
-        enemyFlights = hostileCount.flights(wl, ld)
-        if int(enemyFlights) > 0:
-            print str(enemyFlights) + " incoming hostile flight(s)!"
-            timer.sendWarning(enemyFlights)
-        #if expeditionTime >= 2700:
-        #    print "Taking 2700 seconds off of expedition time & sending expeditions!"
-        #    loop.runExpeditions(wl, ld)
-        #    expeditionTime -= 2700
-        if loop.checkOpenSlots():
-            loop.runExpeditions(wl, ld)
-            
-        detailed = hostileCount.detailedFlights(wl, ld)
-        timer.printFlightInfo(detailed)
-        timer.delayTime(450, 900)
+    try:
+        wl = weblogic.Weblogic()
+        ld = wl.login()
+        timer = TimedExpeditions()
+        hostileCount = header.Header()
+        
+        loop = expedition_loop.ExpeditionLoop(wl, ld)
+        #expeditionTime = 2700
+        enemyFlights = 0
+        while True:
+            enemyFlights = hostileCount.flights(wl, ld)
+            if int(enemyFlights) > 0:
+                print str(enemyFlights) + " incoming hostile flight(s)!"
+                timer.sendWarning(enemyFlights)
+            #if expeditionTime >= 2700:
+            #    print "Taking 2700 seconds off of expedition time & sending expeditions!"
+            #    loop.runExpeditions(wl, ld)
+            #    expeditionTime -= 2700
+            if loop.checkOpenSlots():
+                loop.runExpeditions(wl, ld)
+                
+            detailed = hostileCount.detailedFlights(wl, ld)
+            timer.printFlightInfo(detailed)
+            timer.delayTime(450, 900)
+    except:
+        info = "Unexpected error:", sys.exc_info()[0]
+        print info
+        timer.sendWarning(info)
+        raise
