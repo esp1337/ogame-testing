@@ -58,31 +58,33 @@ class GalaxyScanner:
         
     def scanDownSystems(self, wl, ld, gal_start, system_start, scanLimit):
         gal = gal_start
-        system = system_start
+        system = int(system_start)
         systemOffset = int(0)
         while systemOffset <= int(scanLimit):
-            system -= systemOffset
+            system -= 1
+            systemOffset += 1
             planets = self.getAttackableInactivePlanetsInSystem(wl, ld, gal, system)
-            self.delayTime(1, 5)
+            self.delayTime(5, 10)
             for planet in planets:
                 print "Probing planet " + planet.getInfoString()
                 self.sendProbes(wl, ld, gal, system, planet.slot)
-                self.delayTime(1, 5)
-            systemOffset += 1
+                self.delayTime(2, 5)
+            
     
     def scanUpSystems(self, wl, ld, gal_start, system_start, scanLimit):
         gal = gal_start
-        system = system_start
+        system = int(system_start)
         systemOffset = int(0)
         while systemOffset <= int(scanLimit):
-            system += systemOffset
+            system += 1
+            systemOffset += 1
             planets = self.getAttackableInactivePlanetsInSystem(wl, ld, gal, system)
-            self.delayTime(1, 5)
+            self.delayTime(5, 10)
             for planet in planets:
                 print "Probing planet " + planet.getInfoString()
                 self.sendProbes(wl, ld, gal, system, planet.slot)
-                self.delayTime(1, 5)
-            systemOffset += 1
+                self.delayTime(2, 5)
+            
 
     def delayTime(self, lowerBound, upperBound):
         delay = random.randint(lowerBound, upperBound)
@@ -112,4 +114,4 @@ if __name__ == '__main__':
         wl = weblogic.Weblogic()
         ld = wl.login()
         scanner = GalaxyScanner()
-        scanner.scanSystems(wl, ld, 3, 361, 1)
+        scanner.scanSystems(wl, ld, 3, 361, 25)
