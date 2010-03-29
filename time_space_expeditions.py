@@ -56,7 +56,7 @@ if __name__ == '__main__':
             timer.printFlightInfo(detailed)
             timer.delayTime(450, 900)
     except:
-        info = "Unexpected error:", sys.exc_info()[0]
+        info = "Unexpected error"
         print info
         timer.sendWarning(info)
         raise
