@@ -81,7 +81,7 @@ class SCAttacker:
         fleetTotal = fleetMatch.group(2)
         print "Fleet :: " + fleetCurrent + "/" + fleetTotal
          
-        if int(fleetCurrent) < int(fleetTotal):
+        if int(fleetCurrent)+1 < int(fleetTotal):
             ret = True
         else:
             print "No fleetslots available!"
