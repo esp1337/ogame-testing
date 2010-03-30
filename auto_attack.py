@@ -56,6 +56,11 @@ if __name__ == '__main__':
                 scanner.scanSystems(wl, ld, loc.galaxy, loc.solarsystem, 20)
                 break
         
+        if spiedFrom == None:
+            print "Problem finding the current planet that sent probes out!  Exiting..."
+            aa.sendWarning("Error finding planet that was probed from.")
+            raise
+        
         print "MESSAGE PARSER"
         msgs = messages.Messages(wl, ld)
         eInfo = msgs.getUnreadMessages()
@@ -75,5 +80,5 @@ if __name__ == '__main__':
     except:
         info = "Unexpected error "
         print info
-        #aa.sendWarning(info)
+        aa.sendWarning(info)
         raise
