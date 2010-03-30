@@ -64,7 +64,7 @@ class GalaxyScanner:
             system -= 1
             systemOffset += 1
             planets = self.getAttackableInactivePlanetsInSystem(wl, ld, gal, system)
-            self.delayTime(5, 10)
+            self.delayTime(3, 6)
             for planet in planets:
                 print "Probing planet " + planet.getInfoString()
                 self.sendProbes(wl, ld, gal, system, planet.slot)
@@ -79,7 +79,7 @@ class GalaxyScanner:
             system += 1
             systemOffset += 1
             planets = self.getAttackableInactivePlanetsInSystem(wl, ld, gal, system)
-            self.delayTime(5, 10)
+            self.delayTime(3, 6)
             for planet in planets:
                 print "Probing planet " + planet.getInfoString()
                 self.sendProbes(wl, ld, gal, system, planet.slot)
