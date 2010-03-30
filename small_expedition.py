@@ -85,7 +85,7 @@ class SmallExpedition:
         expTotal = expMatch.group(2)
         print "Expeditions :: " + expCurrent + "/" + expTotal
         
-        if int(fleetCurrent) < int(fleetTotal) and int(expCurrent) < int(expTotal):
+        if int(fleetCurrent)+1 < int(fleetTotal) and int(expCurrent) < int(expTotal):
             ret = True
         else:
             print "No fleetslots available!"
