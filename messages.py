@@ -31,30 +31,49 @@ class Messages:
                     (self.wl.server, args)
         return msgUrl
     
-    def getUnreadMessages(self):
-        page = 1
-        
+    def getUnreadMessages(self, page=1):
         espInfo = []
         
         msgListPageURL = self.getEspionageListURL(page, 7)
-        msgListPage = wl.fetchResponse(msgListPageURL).getvalue()
+        msgListPage = self.wl.fetchResponse(msgListPageURL).getvalue()
         self.delayTime()
         
         unreadMessageResult = self.unreadMessageREGEX.findall(msgListPage)
+        newMessages = len(unreadMessageResult)
+        print "Parsing " + str(newMessages) + " new espionage reports!"
         for result in unreadMessageResult:
             messageURL = self.messagePage %\
                     (self.wl.server, result)
-            message = wl.fetchResponse(messageURL).getvalue()
+            message = self.wl.fetchResponse(messageURL).getvalue()
             self.delayTime(1,2)
             
             if self.hasNoDefense(message) and self.hasNoFleet(message):
                 print "Valid target!"
                 result = self.loc_resREGEX.search(message)
                 info = EspionageInfo(result.group(1), result.group(2), result.group(3), result.group(4), result.group(5), result.group(6))
-                if info.getNumSC() > 1:
-                    print espInfo.getLocation()
+                print "SC needed :: " + str(info.getNumSC())
+                if info.getNumSC() >= 16:
+                    print info.getLocation()
                     espInfo.append(info)
+                    
+        if newMessages == 50:
+            page += 1
+            print "50 messages parsed, checking page " + str(page) + " for more."
+            moreMessages = self.getUnreadMessages(page)
+            espInfo.extend(moreMessages)
+        
+        espInfo.sort(self.compareByTotalRes)
         return espInfo
+    
+    def compareByTotalRes(self, info1, info2):
+        res1 = info1.getTotalResWorth()
+        res2 = info2.getTotalResWorth()
+        if res1 > res2:
+            return -1
+        elif res2 > res1:
+            return 1
+        else:
+            return 0
     
     def hasNoFleet(self, message):
         fleetTable = 0
@@ -91,13 +110,15 @@ class EspionageInfo:
         self.gal = gal
         self.ss = ss
         self.slot = slot
-        self.met = met
-        self.cry = cry
-        self.deut = deut
+        self.met = self.getFloatFromString(met)
+        self.cry = self.getFloatFromString(cry)
+        self.deut = self.getFloatFromString(deut)
+        print self.getLocation()+"\t"+str(self.getTotalResWorth())+"\t"+str(self.getNumSC())
         
     def getNumSC(self):
-        total = self.getTotalResWorth()
-        sc = total / 5000
+        total = self.met + self.cry + self.deut
+        totalCapture = total / 2
+        sc = totalCapture / 5000
         sc += 1
         return int(sc)
     
@@ -108,18 +129,29 @@ class EspionageInfo:
         total += float(self.deut) * 3
         return total
     
+    def getFloatFromString(self, target):
+        digitRegex = re.compile("(\d+)")
+        delimeterRegex = re.compile("\.")
+        
+        count = len(delimeterRegex.findall(target))
+        number = digitRegex.search(target).group(1)
+        
+        if int(count) > 0:
+            value = int(number) * (1000 ** int(count))
+        else:
+            value = number
+        
+        return float(value)
+    
     def getLocation(self):
         return "["+str(self.gal)+":"+str(self.ss)+":"+str(self.slot)+"]"
-
+    
 if __name__ == '__main__':
     wl = weblogic.Weblogic()
     ld = wl.login()
     msgs = Messages(wl, ld)
-    info = msgs.getUnreadMessages()
-    print str(info.sort(lambda x,y: y.getNumSC() - x.getNumSC()))
-    for eInfo in info:
-        print eInfo.getLocation()
-        print eInfo.getTotalResWorth()
-        print eInfo.getNumSC()
+    eInfo = msgs.getUnreadMessages()
+    for info in eInfo:
+        print info.getLocation()+"\t"+str(info.getTotalResWorth())+"\t"+str(info.getNumSC())
     
     
