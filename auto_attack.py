@@ -46,8 +46,6 @@ if __name__ == '__main__':
         wl = weblogic.Weblogic()
         ld = wl.login()
         
-        aa.checkHostileFlights(wl, ld)
-        
         print "PLANET FINDER"
         planetManager = planets.PlanetManager(wl)
         planetList = planets.PlanetManager.availablePlanets(planetManager, wl.getRecentResponse())
@@ -63,7 +61,7 @@ if __name__ == '__main__':
                 spiedFrom = planet
                 planet.switch("overview", ld.session)
                 loc = planet.location
-                scanner.scanSystems(wl, ld, loc.galaxy, loc.solarsystem, 20)
+                scanner.scanSystems(wl, ld, loc.galaxy, loc.solarsystem, 30)
                 break
         
         if spiedFrom == None:
@@ -78,6 +76,8 @@ if __name__ == '__main__':
         print "MESSAGE PARSER"
         msgs = messages.Messages(wl, ld)
         eInfo = msgs.getUnreadMessages()
+        for info in eInfo:
+            print info.getLocation()+"\t"+str(info.getNumSC())
         
         aa.checkHostileFlights(wl, ld)
         
