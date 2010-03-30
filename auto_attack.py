@@ -12,6 +12,7 @@ class AutoAttacks:
     
     def __init__(self):
         self.mailer = mail.MailSender()
+        self.header = header.Header()
     
     def delayTime(self, lowerBound=2, upperBound=5):
         delay = random.randint(lowerBound, upperBound)
@@ -20,7 +21,7 @@ class AutoAttacks:
         return delay
     
     def sendWarning(self, flightCount):
-        title = "Attack warning!"
+        title = "Attack warning! "
         body = str(flightCount) + " hostile fleets are incoming!"
         self.mailer.sendEmail(title, body)
         
@@ -31,6 +32,12 @@ class AutoAttacks:
         print "Current Fleet Info :: "
         for flight in detailedFlightList:
             print "\t" + flight.toShortString()
+            
+    def checkHostileFlights(self, wl, ld):
+        enemyFlights = self.header.flights(wl, ld)
+        if int(enemyFlights) > 0:
+            print str(enemyFlights) + " incoming hostile flight(s)!"
+            self.sendWarning(enemyFlights)
     
 if __name__ == '__main__':
     aa = AutoAttacks()
@@ -38,6 +45,9 @@ if __name__ == '__main__':
     try:
         wl = weblogic.Weblogic()
         ld = wl.login()
+        
+        aa.checkHostileFlights(wl, ld)
+        
         print "PLANET FINDER"
         planetManager = planets.PlanetManager(wl)
         planetList = planets.PlanetManager.availablePlanets(planetManager, wl.getRecentResponse())
@@ -61,9 +71,15 @@ if __name__ == '__main__':
             aa.sendWarning("Error finding planet that was probed from.")
             raise
         
+        #delay to let final espionage missions finish
+        aa.delayTime(20, 30)
+        aa.checkHostileFlights(wl, ld)
+        
         print "MESSAGE PARSER"
         msgs = messages.Messages(wl, ld)
         eInfo = msgs.getUnreadMessages()
+        
+        aa.checkHostileFlights(wl, ld)
         
         print "AUTO ATTACKER"
         attacker = smallCargoRaid.SCAttacker(wl, ld)
@@ -77,6 +93,8 @@ if __name__ == '__main__':
             tgt_posn = info.slot
             attacker.attackFlightFromPlanet(sc, home_gal, home_ss, home_posn, tgt_gal, tgt_ss, tgt_posn)
             aa.delayTime(1, 3)
+            
+        aa.checkHostileFlights(wl, ld)
     except:
         info = "Unexpected error "
         print info
