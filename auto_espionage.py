@@ -14,7 +14,7 @@ if __name__ == '__main__':
     planetManager = planets.PlanetManager(wl)
     planetList = planets.PlanetManager.availablePlanets(planetManager, wl.getRecentResponse())
     planetList.append(planetManager.currentPlanet(wl.getRecentResponse()))
-    targetPlanet = "Pantomime"
+    targetPlanet = ""
     for planet in planetList:
         print planet.name
         if str(planet.name) == targetPlanet:
