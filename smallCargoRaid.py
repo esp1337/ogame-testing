@@ -41,7 +41,7 @@ class SCAttacker:
         fleet_url = check_page %\
                     (self.wl.server, self.ld.session, tgt_gal, tgt_ss, tgt_posn)
         page = self.wl.fetchResponse(fleet_url)
-        if not page.getvalue() == 0:
+        if not page.getvalue() == str(0):
             print "Fleetcheck returned a nonzero value:" + str(page.getvalue())
             return False
         
