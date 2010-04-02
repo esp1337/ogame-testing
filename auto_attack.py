@@ -91,7 +91,7 @@ if __name__ == '__main__':
             tgt_gal = info.gal
             tgt_ss = info.ss
             tgt_posn = info.slot
-            attacker.attackFlightFromPlanet(sc, home_gal, home_ss, home_posn, tgt_gal, tgt_ss, tgt_posn)
+            attacker.attackFlightFromPlanet(sc, home_gal, home_ss, home_posn, tgt_gal, tgt_ss, tgt_posn):
             aa.delayTime(1, 3)
             
         aa.checkHostileFlights(wl, ld)
