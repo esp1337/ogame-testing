@@ -64,11 +64,9 @@ class GalaxyScanner:
             system -= 1
             systemOffset += 1
             planets = self.getAttackableInactivePlanetsInSystem(wl, ld, gal, system)
-            self.delayTime(3, 6)
             for planet in planets:
                 print "Probing planet " + planet.getInfoString()
                 self.sendProbes(wl, ld, gal, system, planet.slot)
-                self.delayTime(2, 5)
             
     
     def scanUpSystems(self, wl, ld, gal_start, system_start, scanLimit):
@@ -79,19 +77,10 @@ class GalaxyScanner:
             system += 1
             systemOffset += 1
             planets = self.getAttackableInactivePlanetsInSystem(wl, ld, gal, system)
-            self.delayTime(3, 6)
             for planet in planets:
                 print "Probing planet " + planet.getInfoString()
                 self.sendProbes(wl, ld, gal, system, planet.slot)
-                self.delayTime(2, 5)
             
-
-    def delayTime(self, lowerBound, upperBound):
-        delay = random.randint(lowerBound, upperBound)
-        print "Sleeping " + str(delay) + " seconds..."
-        time.sleep(delay)
-        return delay
-
 class PlanetInfo:
     def __init__(self, gal, system, slot):
         self.galaxy = gal

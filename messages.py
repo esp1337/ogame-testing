@@ -1,7 +1,5 @@
 import weblogic
 import re
-import time
-import random
 
 class Messages:
     
@@ -15,11 +13,6 @@ class Messages:
         self.loc_resREGEX = re.compile("\[(\d+):(\d+):(\d+)\].+?Metal:\s*</td>\s*<td>\s*([\d.]+).+?Crystal:\s*</td>\s*<td>\s*([\d.]+).+?Deuterium:\s*</td>\s*<td>\s*([\d.]+)", re.DOTALL)
         self.infoTablesREGEX = re.compile("class=\"fleetdefbuildings spy\">(.+?)</table>", re.DOTALL)
         self.tableKeyValueREGEX = re.compile("<td class=key>(.+?)</td>\s*<td class=value>([\d.]+)</td>", re.DOTALL)
-        
-    def delayTime(self, min=1, max=5):
-        delay = random.randint(min,max)
-        print "Sleeping " + str(delay) + " seconds between requests..."
-        time.sleep(delay)
         
     def getEspionageListURL(self, page=1, cat = 7):
         spyUrl = self.messageListPage %\
@@ -35,8 +28,10 @@ class Messages:
         espInfo = []
         
         msgListPageURL = self.getEspionageListURL(page, 7)
-        msgListPage = self.wl.fetchResponse(msgListPageURL).getvalue()
-        self.delayTime()
+        try:
+            msgListPage = self.wl.fetchResponse(msgListPageURL).getvalue()
+        except (SMTPConnectError, SMTPConnectError, BadStatusLine):
+            msgListPage = self.wl.fetchResponse(msgListPageURL).getvalue()
         
         unreadMessageResult = self.unreadMessageREGEX.findall(msgListPage)
         newMessages = len(unreadMessageResult)
@@ -44,8 +39,10 @@ class Messages:
         for result in unreadMessageResult:
             messageURL = self.messagePage %\
                     (self.wl.server, result)
-            message = self.wl.fetchResponse(messageURL).getvalue()
-            self.delayTime(1,2)
+            try:
+                message = self.wl.fetchResponse(messageURL).getvalue()
+            except (SMTPConnectError, SMTPConnectError, BadStatusLine):
+                message = self.wl.fetchResponse(messageURL).getvalue()
             
             if self.hasNoDefense(message) and self.hasNoFleet(message):
                 print "Valid target!"
@@ -78,7 +75,10 @@ class Messages:
     def hasNoFleet(self, message):
         fleetTable = 0
         tables = self.infoTablesREGEX.findall(message)
-        fleet = tables[fleetTable]
+        try:
+            fleet = tables[fleetTable]
+        except IndexError:
+            return False
         fleetList = self.tableKeyValueREGEX.findall(fleet)
         print fleetList
         if len(fleetList) < 1:
@@ -89,7 +89,10 @@ class Messages:
     def hasNoDefense(self, message):
         defenseTable = 1
         tables = self.infoTablesREGEX.findall(message)
-        defense = tables[defenseTable]
+        try:
+            defense = tables[defenseTable]
+        except IndexError:
+            return False
         defenseList = self.tableKeyValueREGEX.findall(defense)
         print defenseList
         if len(defenseList) < 1:

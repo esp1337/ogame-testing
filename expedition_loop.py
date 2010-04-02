@@ -41,11 +41,6 @@ class ExpeditionLoop:
         f = large_redesign_expedition.LargeExpedition(self.wl, self.ld)
         return f.expeditionFlightFromPlanet(gal, ss, posn)
     
-    def delayTime(self):
-        delay = random.randint(1,5)
-        print "Sleeping " + str(delay) + " seconds between requests..."
-        time.sleep(delay)
-    
     def getFleetURL(self, wl, ld):
         fleetUrl = self.fleet1 %\
                     (wl.server, ld.session)
@@ -56,7 +51,6 @@ class ExpeditionLoop:
         fleet1_url = self.getFleetURL(wl, ld)
         fleetpage = wl.fetchResponse(fleet1_url)
         planetManager = planets.PlanetManager(wl)
-        self.delayTime()
         current = planets.PlanetManager.currentPlanet(planetManager, fleetpage)
         
         if not self.checkOpenSlots():
@@ -70,14 +64,12 @@ class ExpeditionLoop:
             if not self.checkOpenSlots():
                 print "No open slots, cancelling expedition loop!"
                 return
-            self.delayTime()
             self.largeExpeditionFromPlanet(planet)
             
         for planet in planetList:
             if not self.checkOpenSlots():
                 print "No open slots, cancelling small expedition loop!"
                 return
-            self.delayTime()
             self.smallExpeditionFromPlanet(planet)
         
         #small expeditions prioritized after last

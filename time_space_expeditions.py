@@ -31,10 +31,10 @@ class TimedExpeditions:
             print "\t" + flight.toShortString()
     
 if __name__ == '__main__':
+    timer = TimedExpeditions()
     try:
         wl = weblogic.Weblogic()
         ld = wl.login()
-        timer = TimedExpeditions()
         hostileCount = header.Header()
         
         loop = expedition_loop.ExpeditionLoop(wl, ld)
@@ -55,6 +55,9 @@ if __name__ == '__main__':
             detailed = hostileCount.detailedFlights(wl, ld)
             timer.printFlightInfo(detailed)
             timer.delayTime(450, 900)
+    except KeyboardInterrupt:
+        print "Quitting..."
+        timer.sendWarning("Keyboard termination occurred.", "Expeditions Terminated")
     except:
         info = "Unexpected error"
         print info
