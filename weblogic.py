@@ -5,6 +5,8 @@ Weblogic Module
 elliot 2010
 """
 
+import time
+import random
 import re
 import unittest
 import urllib
@@ -36,6 +38,12 @@ class Weblogic:
         headers = [('Keep-Alive', "300")]
         self.opener.addheaders = headers
 
+    def delayTime(self, lowerBound=2, upperBound=4):
+        delay = random.randint(lowerBound, upperBound)
+        print "Sleeping " + str(delay) + " seconds after request..."
+        time.sleep(delay)
+        return delay
+
     def submitRequest(self, request):
         self.requestQueue.put(request)
 
@@ -57,6 +65,7 @@ class Weblogic:
         cachedResponse = StringIO.StringIO(response.read())
         cachedResponse.seek(0)
         self.setRecentResponse(cachedResponse)
+        self.delayTime()
         return cachedResponse
     
     def login(self):
