@@ -1,5 +1,6 @@
 import weblogic
 import re
+import smtplib
 
 class Messages:
     
@@ -30,7 +31,7 @@ class Messages:
         msgListPageURL = self.getEspionageListURL(page, 7)
         try:
             msgListPage = self.wl.fetchResponse(msgListPageURL).getvalue()
-        except (SMTPConnectError, SMTPConnectError, BadStatusLine):
+        except (smtplib.SMTPConnectError, smtplib.BadStatusLine):
             msgListPage = self.wl.fetchResponse(msgListPageURL).getvalue()
         
         unreadMessageResult = self.unreadMessageREGEX.findall(msgListPage)
@@ -41,7 +42,7 @@ class Messages:
                     (self.wl.server, result)
             try:
                 message = self.wl.fetchResponse(messageURL).getvalue()
-            except (SMTPConnectError, SMTPConnectError, BadStatusLine):
+            except (smtplib.SMTPConnectError, smtplib.BadStatusLine):
                 message = self.wl.fetchResponse(messageURL).getvalue()
             
             if self.hasNoDefense(message) and self.hasNoFleet(message):

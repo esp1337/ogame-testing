@@ -7,6 +7,7 @@ import mail
 import planets
 import messages
 import galaxy
+import smtplib
 
 class AutoAttacks:
     
@@ -91,11 +92,11 @@ if __name__ == '__main__':
             tgt_gal = info.gal
             tgt_ss = info.ss
             tgt_posn = info.slot
-			try:
+            try:
                 success = attacker.attackFlightFromPlanet(sc, home_gal, home_ss, home_posn, tgt_gal, tgt_ss, tgt_posn)
                 if not success:
                     break
-            except (SMTPConnectError, SMTPConnectError, BadStatusLine):
+            except (smtplib.SMTPConnectError, smtplib.BadStatusLine):
                 success = attacker.attackFlightFromPlanet(sc, home_gal, home_ss, home_posn, tgt_gal, tgt_ss, tgt_posn)
                 if not success:
                     break
