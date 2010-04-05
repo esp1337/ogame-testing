@@ -39,11 +39,6 @@ if __name__ == '__main__':
         hostileCount = header.Header()
         
         planetManager = planets.PlanetManager(wl)
-        timer.delayTime()
-        fleetUrl = timer.overview %\
-                    (wl.server, ld.session)
-        fleetpage = wl.fetchResponse(fleetUrl)
-        planetList = planets.PlanetManager.availablePlanets(planetManager, fleetpage)
         
         enemyFlights = 0
         while True:
@@ -51,9 +46,11 @@ if __name__ == '__main__':
             if int(enemyFlights) > 0:
                 print str(enemyFlights) + " incoming hostile flight(s)!"
                 timer.sendAttackWarning(enemyFlights)
-                
-            
-            
+
+            fleetUrl = timer.overview %\
+                    (wl.server, ld.session)
+            fleetpage = wl.fetchResponse(fleetUrl)
+            planetList = planets.PlanetManager.availablePlanets(planetManager, fleetpage)
             for planet in planetList:
                 print "Switching to planet :: " + str(planet.name)
                 planet.switch("overview", ld.session)
@@ -61,8 +58,11 @@ if __name__ == '__main__':
             detailed = hostileCount.detailedFlights(wl, ld)
             timer.printFlightInfo(detailed)
             timer.delayTime(450, 900)
+    except KeyboardInterrupt:
+        print "Quitting..."
+#        timer.sendWarning("Keyboard termination occurred.", "Expeditions Terminated")
     except:
-        info = "Unexpected error"
+        info = "Unexpected error!"
         print info
         timer.sendErrorWarning(info)
         raise

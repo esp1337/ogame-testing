@@ -8,6 +8,7 @@ import planets
 import messages
 import galaxy
 import smtplib
+import httplib
 
 class AutoAttacks:
     
@@ -62,7 +63,7 @@ if __name__ == '__main__':
                 spiedFrom = planet
                 planet.switch("overview", ld.session)
                 loc = planet.location
-                scanner.scanSystems(wl, ld, loc.galaxy, loc.solarsystem, 30)
+                scanner.scanSystems(wl, ld, loc.galaxy, loc.solarsystem, 35)
                 break
         
         if spiedFrom == None:
@@ -96,11 +97,14 @@ if __name__ == '__main__':
                 success = attacker.attackFlightFromPlanet(sc, home_gal, home_ss, home_posn, tgt_gal, tgt_ss, tgt_posn)
                 if not success:
                     break
-            except (smtplib.SMTPConnectError, smtplib.BadStatusLine):
+            except (smtplib.SMTPConnectError, httplib.BadStatusLine):
                 success = attacker.attackFlightFromPlanet(sc, home_gal, home_ss, home_posn, tgt_gal, tgt_ss, tgt_posn)
                 if not success:
                     break
         aa.checkHostileFlights(wl, ld)
+    except KeyboardInterrupt:
+        print "Quitting..."
+#        timer.sendWarning("Keyboard termination occurred.", "Expeditions Terminated")
     except:
         info = "Unexpected error "
         print info

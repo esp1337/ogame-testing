@@ -49,15 +49,15 @@ if __name__ == '__main__':
             #    print "Taking 2700 seconds off of expedition time & sending expeditions!"
             #    loop.runExpeditions(wl, ld)
             #    expeditionTime -= 2700
-            if loop.checkOpenSlots():
-                loop.runExpeditions(wl, ld)
+            #if loop.checkOpenSlots():
+            loop.runExpeditions(wl, ld)
                 
             detailed = hostileCount.detailedFlights(wl, ld)
             timer.printFlightInfo(detailed)
             timer.delayTime(450, 900)
     except KeyboardInterrupt:
         print "Quitting..."
-        timer.sendWarning("Keyboard termination occurred.", "Expeditions Terminated")
+#        timer.sendWarning("Keyboard termination occurred.", "Expeditions Terminated")
     except:
         info = "Unexpected error"
         print info
