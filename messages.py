@@ -2,6 +2,7 @@ import weblogic
 import re
 import smtplib
 import httplib
+import urllib2
 
 class Messages:
     
@@ -43,7 +44,7 @@ class Messages:
                     (self.wl.server, result)
             try:
                 message = self.wl.fetchResponse(messageURL).getvalue()
-            except (smtplib.SMTPConnectError, httplib.BadStatusLine):
+            except (smtplib.SMTPConnectError, httplib.BadStatusLine, urllib2.HTTPError):
                 message = self.wl.fetchResponse(messageURL).getvalue()
             
             if self.hasNoDefense(message) and self.hasNoFleet(message):

@@ -8,6 +8,7 @@ import planets
 import messages
 import galaxy
 import smtplib
+import urllib2
 import httplib
 
 class AutoAttacks:
@@ -97,7 +98,7 @@ if __name__ == '__main__':
                 success = attacker.attackFlightFromPlanet(sc, home_gal, home_ss, home_posn, tgt_gal, tgt_ss, tgt_posn)
                 if not success:
                     break
-            except (smtplib.SMTPConnectError, httplib.BadStatusLine):
+            except (smtplib.SMTPConnectError, httplib.BadStatusLine, urllib2.HTTPError):
                 success = attacker.attackFlightFromPlanet(sc, home_gal, home_ss, home_posn, tgt_gal, tgt_ss, tgt_posn)
                 if not success:
                     break

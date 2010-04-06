@@ -3,6 +3,7 @@ import weblogic
 import planets
 import time
 import random
+import httplib
 """
 check probe/flight status
 """
@@ -45,7 +46,10 @@ class GalaxyScanner:
         probe_url = self.espionageSendURL %\
                     (wl.server, ld.session, str(gal), str(system), str(slot))
         print probe_url
-        page = wl.fetchResponse(probe_url)
+        try:
+            page = wl.fetchResponse(probe_url)
+        except (httplib.BadStatusLine):
+            page = wl.fetchResponse(probe_url)
         page = page.getvalue()
         #returns a string with
         #statusCode totalSlots probesLeft recyclersLeft ipmsLeft probesSent missionType [coords]
