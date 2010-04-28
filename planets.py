@@ -6,6 +6,7 @@ elliot 2010
 """
 
 import weblogic
+import httplib
 import unittest
 import re
 
@@ -120,7 +121,11 @@ class Planet:
         """
         sw_url = "http://%s.ogame.org/game/index.php?page=%s&session=%s&cp=%s" \
                  % (self.wl.server, pane, session, self.id)
-        self.wl.fetchResponse(sw_url)
+        
+        try:
+            self.wl.fetchResponse(sw_url)
+        except (httplib.BadStatusLine):
+            self.wl.fetchResponse(sw_url)
 
     def toString(self):
         return "name: %s\nfields: %s/%s\nlocation: %s" %\
