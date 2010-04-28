@@ -122,8 +122,14 @@ class EspionageInfo:
         print self.getLocation()+"\t"+str(self.getTotalResWorth())+"\t"+str(self.getNumSC())
         
     def getNumSC(self):
-        total = self.met + self.cry + self.deut
-        totalCapture = total / 2
+#            CargoCapacity2 = 0.5 * Max(M + C + D, Min(0.75 * (2 * M + C + D), 2 * M + D))
+        m = self.met
+        c = self.cry
+        d = self.deut
+        totalCapture = 0.5 * max(m + c + d, min(0.75 * (2 * m + c + d), 2 * m + d))
+        
+#        total = self.met + self.cry + self.deut
+#        totalCapture = total / 2
         sc = totalCapture / 5000
         sc += 1
         return int(sc)
