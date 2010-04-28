@@ -24,7 +24,9 @@ class PlanetManager:
         self.wl = wl
         self.PLANET_COUNT_REGEX = re.compile("span\>(\d+)\/\d+\<", re.S|re.M)
         # group1: id;  group2: usedfields; group3: totalfields; group4: name; group5: coords
-        self.PLANET_FIND_REGEX = re.compile("smallplanet.*?href\=\".*?cp\=(.*?)\".*?km\s\((\d+)\/(\d+).*?name\"\>(.*?)\<\/span.*?koords\"\>(.*?)\<\/", re.S|re.M)
+        
+        #self.PLANET_FIND_REGEX = re.compile("smallplanet.*?href\=\".*?cp\=(.*?)\".*?km\s\((\d+)\/(\d+).*?name\"\>(.*?)\<\/span.*?koords\"\>(.*?)\<\/", re.S|re.M)
+        self.PLANET_FIND_REGEX = re.compile("smallplanet.*?href\=\".*?cp\=(.*?)\".*?km\s\(.*?(\d+).*?\/(\d+).*?name\"\>(.*?)\<\/span.*?koords\"\>(.*?)\<\/", re.S|re.M)
         # group1: usedfields; group2: totalfields; group3: name; group4: coords
         self.PLANET_FIND_REGEX_NO_SWITCH = re.compile("smallplanet.*?href\=\".*?\".*?km\s\((\d+)\/(\d+).*?name\"\>(.*?)\<\/span.*?koords\"\>(.*?)\<\/", re.S|re.M)
 
@@ -61,7 +63,8 @@ class PlanetManager:
         aps = self.PLANET_FIND_REGEX.finditer(page)
         for ap in aps:
             p = Planet(self.wl, ap.group(4), ap.group(1),
-                       int(ap.group(2)), int(ap.group(3)),
+                       int(ap.group(2)),
+                        int(ap.group(3)),
                        (Location(ap.group(5))))
             planets.append(p)
             # if we don't know about this planet, add it to the self.planets list
