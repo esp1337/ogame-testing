@@ -23,7 +23,10 @@ class GalaxyScanner:
     def getAttackableInactivePlanetsInSystem(self, wl, ld, gal, system):
         galaxy_url = self.galaxyURL %\
                     (wl.server, ld.session, gal, system)
-        page = wl.fetchResponse(galaxy_url)
+        try:
+            page = wl.fetchResponse(galaxy_url)
+        except (httplib.BadStatusLine):
+            page = wl.fetchResponse(galaxy_url)
         page = page.getvalue()
         
         return self.getAttackableInactivePlanets(page, gal, system)
