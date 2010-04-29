@@ -17,7 +17,11 @@ class Header:
         header_url = self.flightInfoURL %\
                     (wl.server, ld.session)
         page = wl.fetchResponse(header_url)
-        enemy = self.HOSTILE_INDEX.search(page.getvalue()).group(1)
+        matches = self.HOSTILE_INDEX.search(page.getvalue())
+        if matches is None:
+            enemy = 0
+        else:
+            enemy = matches.group(1)
         return enemy
     
     def detailedFlights(self, wl, ld):
